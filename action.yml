@@ -1,0 +1,23 @@
+name: 'Dynamic Matrix Generator'
+description: 'Generate dynamic GitHub Actions matrices based on conditional logic'
+author: 'Ryoga Kato'
+
+branding:
+  icon: 'grid'
+  color: 'blue'
+
+inputs:
+  conditions-file:
+    description: 'Path to conditions JSON file'
+    required: false
+  conditions-json:
+    description: 'Inline conditions JSON string'
+    required: false
+
+outputs:
+  matrix:
+    description: 'Generated matrix in GitHub Actions format'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
