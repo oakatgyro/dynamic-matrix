@@ -4,27 +4,29 @@ import {
   ComparisonOperator,
   EvaluationResult,
   ConditionConfig,
-  ConditionDefinition
-} from './types';
+  ConditionDefinition,
+  JsonValue,
+  JsonObject
+} from './types.js'
 
 export class ConditionEvaluator {
-  private context: Record<string, any>;
+  private context: JsonObject
 
-  constructor(context: Record<string, any>) {
-    this.context = context;
+  constructor(context: JsonObject) {
+    this.context = context
   }
 
   evaluate(config: ConditionConfig): EvaluationResult {
-    const matchedConditions: string[] = [];
-    let combinedOutputs: Record<string, any> = {};
-    let hasMatch = false;
+    const matchedConditions: string[] = []
+    let combinedOutputs: JsonObject = {}
+    let hasMatch = false
 
     for (const [name, definition] of Object.entries(config)) {
-      const result = this.evaluateDefinition(name, definition);
+      const result = this.evaluateDefinition(name, definition)
       if (result.matched) {
-        hasMatch = true;
-        matchedConditions.push(...result.matchedConditions);
-        combinedOutputs = { ...combinedOutputs, ...result.outputs };
+        hasMatch = true
+        matchedConditions.push(...result.matchedConditions)
+        combinedOutputs = { ...combinedOutputs, ...result.outputs }
       }
     }
 
@@ -32,127 +34,153 @@ export class ConditionEvaluator {
       matched: hasMatch,
       matchedConditions,
       outputs: combinedOutputs
-    };
+    }
   }
 
-  private evaluateDefinition(name: string, definition: ConditionDefinition): EvaluationResult {
+  private evaluateDefinition(
+    name: string,
+    definition: ConditionDefinition
+  ): EvaluationResult {
     if (!definition.conditions && !definition['conditions-file']) {
-      throw new Error(`Condition "${name}" must have either 'conditions' or 'conditions-file'`);
+      throw new Error(
+        `Condition "${name}" must have either 'conditions' or 'conditions-file'`
+      )
     }
 
-    const operator = definition.operator || 'and';
-    const conditions = definition.conditions || [];
-    const outputs = definition.outputs || {};
+    const operator = definition.operator || 'and'
+    const conditions = definition.conditions || []
+    const outputs = definition.outputs || {}
 
     if (conditions.length === 0) {
       return {
         matched: true,
         matchedConditions: [name],
         outputs
-      };
+      }
     }
 
     const matched = this.evaluateConditionGroup({
       operator,
       conditions
-    });
+    })
 
     return {
       matched,
       matchedConditions: matched ? [name] : [],
       outputs: matched ? outputs : {}
-    };
+    }
   }
 
   private evaluateConditionGroup(group: ConditionGroup): boolean {
-    const { operator, conditions } = group;
+    const { operator, conditions } = group
 
     if (conditions.length === 0) {
-      return true;
+      return true
     }
 
-    const results = conditions.map(condition => {
+    const results = conditions.map((condition) => {
       if (this.isConditionGroup(condition)) {
-        return this.evaluateConditionGroup(condition);
+        return this.evaluateConditionGroup(condition)
       } else {
-        return this.evaluateCondition(condition as Condition);
+        return this.evaluateCondition(condition as Condition)
       }
-    });
+    })
 
     if (operator === 'and') {
-      return results.every(result => result);
+      return results.every((result) => result)
     } else {
-      return results.some(result => result);
+      return results.some((result) => result)
     }
   }
 
   private evaluateCondition(condition: Condition): boolean {
-    const { field, op, value } = condition;
-    const fieldValue = this.getFieldValue(field);
+    const { field, op, value } = condition
+    const fieldValue = this.getFieldValue(field)
 
-    return this.compareValues(fieldValue, op, value);
+    return this.compareValues(fieldValue, op, value)
   }
 
-  private getFieldValue(field: string): any {
-    const parts = field.split('.');
-    let value: any = this.context;
+  private getFieldValue(field: string): JsonValue | undefined {
+    const parts = field.split('.')
+    let value: JsonValue | undefined = this.context
 
     for (const part of parts) {
-      if (value == null) {
-        return undefined;
+      if (value == null || typeof value !== 'object' || Array.isArray(value)) {
+        return undefined
       }
-      value = value[part];
+      value = (value as JsonObject)[part]
     }
 
-    return value;
+    return value
   }
 
-  private compareValues(fieldValue: any, op: ComparisonOperator, compareValue: any): boolean {
+  private compareValues(
+    fieldValue: JsonValue | undefined,
+    op: ComparisonOperator,
+    compareValue: JsonValue
+  ): boolean {
     switch (op) {
       case '=':
-        return fieldValue == compareValue;
+        return fieldValue == compareValue
       case '!=':
-        return fieldValue != compareValue;
+        return fieldValue != compareValue
       case '>':
-        return Number(fieldValue) > Number(compareValue);
+        return Number(fieldValue) > Number(compareValue)
       case '>=':
-        return Number(fieldValue) >= Number(compareValue);
+        return Number(fieldValue) >= Number(compareValue)
       case '<':
-        return Number(fieldValue) < Number(compareValue);
+        return Number(fieldValue) < Number(compareValue)
       case '<=':
-        return Number(fieldValue) <= Number(compareValue);
+        return Number(fieldValue) <= Number(compareValue)
       case 'contains':
         if (Array.isArray(fieldValue)) {
-          return fieldValue.includes(compareValue);
+          return fieldValue.includes(compareValue)
         }
-        if (typeof fieldValue === 'string' && typeof compareValue === 'string') {
-          return fieldValue.toLowerCase().includes(compareValue.toLowerCase());
+        if (
+          typeof fieldValue === 'string' &&
+          typeof compareValue === 'string'
+        ) {
+          return fieldValue.toLowerCase().includes(compareValue.toLowerCase())
         }
-        return false;
+        return false
       case 'not_contains':
         if (Array.isArray(fieldValue)) {
-          return !fieldValue.includes(compareValue);
+          return !fieldValue.includes(compareValue)
         }
-        if (typeof fieldValue === 'string' && typeof compareValue === 'string') {
-          return !fieldValue.toLowerCase().includes(compareValue.toLowerCase());
+        if (
+          typeof fieldValue === 'string' &&
+          typeof compareValue === 'string'
+        ) {
+          return !fieldValue.toLowerCase().includes(compareValue.toLowerCase())
         }
-        return true;
+        return true
       case 'starts_with':
-        if (typeof fieldValue === 'string' && typeof compareValue === 'string') {
-          return fieldValue.toLowerCase().startsWith(compareValue.toLowerCase());
+        if (
+          typeof fieldValue === 'string' &&
+          typeof compareValue === 'string'
+        ) {
+          return fieldValue.toLowerCase().startsWith(compareValue.toLowerCase())
         }
-        return false;
+        return false
       case 'ends_with':
-        if (typeof fieldValue === 'string' && typeof compareValue === 'string') {
-          return fieldValue.toLowerCase().endsWith(compareValue.toLowerCase());
+        if (
+          typeof fieldValue === 'string' &&
+          typeof compareValue === 'string'
+        ) {
+          return fieldValue.toLowerCase().endsWith(compareValue.toLowerCase())
         }
-        return false;
+        return false
       default:
-        throw new Error(`Unknown operator: ${op}`);
+        throw new Error(`Unknown operator: ${op}`)
     }
   }
 
-  private isConditionGroup(obj: any): obj is ConditionGroup {
-    return obj && typeof obj === 'object' && 'operator' in obj && 'conditions' in obj;
+  private isConditionGroup(obj: unknown): obj is ConditionGroup {
+    return (
+      obj !== null &&
+      typeof obj === 'object' &&
+      'operator' in obj &&
+      'conditions' in obj
+    )
   }
 }

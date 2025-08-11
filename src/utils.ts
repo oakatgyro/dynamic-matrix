@@ -1,80 +1,88 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as core from '@actions/core';
-import { ConditionConfig, MatrixOutput } from './types';
+import * as fs from 'fs'
+import * as path from 'path'
+import * as core from '@actions/core'
+import {
+  ConditionConfig,
+  MatrixOutput,
+  JsonValue,
+  JsonObject
+} from './types.js'
 
 export function loadConditionsFromFile(filePath: string): ConditionConfig {
   try {
-    const absolutePath = path.resolve(filePath);
+    const absolutePath = path.resolve(filePath)
     if (!fs.existsSync(absolutePath)) {
-      throw new Error(`Conditions file not found: ${absolutePath}`);
+      throw new Error(`Conditions file not found: ${absolutePath}`)
     }
 
-    const fileContent = fs.readFileSync(absolutePath, 'utf8');
-    return JSON.parse(fileContent);
+    const fileContent = fs.readFileSync(absolutePath, 'utf8')
+    return JSON.parse(fileContent)
   } catch (error) {
-    throw new Error(`Failed to load conditions from file: ${error}`);
+    throw new Error(`Failed to load conditions from file: ${error}`)
   }
 }
 
-export function parseJsonString(jsonString: string, fieldName: string): any {
+export function parseJsonString(
+  jsonString: string,
+  fieldName: string
+): JsonValue {
   try {
-    return JSON.parse(jsonString);
+    return JSON.parse(jsonString) as JsonValue
   } catch (error) {
-    throw new Error(`Failed to parse ${fieldName}: ${error}`);
+    throw new Error(`Failed to parse ${fieldName}: ${error}`)
   }
 }
 
-export function generateMatrix(outputs: Record<string, any>[]): MatrixOutput {
+export function generateMatrix(outputs: JsonObject[]): MatrixOutput {
   if (outputs.length === 0) {
-    return { include: [] };
+    return { include: [] }
   }
 
-  const uniqueOutputs = removeDuplicates(outputs);
-  
+  const uniqueOutputs = removeDuplicates(outputs)
+
   return {
     include: uniqueOutputs
-  };
+  }
 }
 
-function removeDuplicates(array: Record<string, any>[]): Record<string, any>[] {
-  const seen = new Set<string>();
-  const result: Record<string, any>[] = [];
+function removeDuplicates(array: JsonObject[]): JsonObject[] {
+  const seen = new Set<string>()
+  const result: JsonObject[] = []
 
   for (const item of array) {
-    const key = JSON.stringify(item);
+    const key = JSON.stringify(item)
     if (!seen.has(key)) {
-      seen.add(key);
-      result.push(item);
+      seen.add(key)
+      result.push(item)
     }
   }
 
-  return result;
+  return result
 }
 
-export function mergeOutputs(outputsList: Record<string, any>[]): Record<string, any> {
+export function mergeOutputs(outputsList: JsonObject[]): JsonObject {
   return outputsList.reduce((merged, outputs) => {
-    return { ...merged, ...outputs };
-  }, {});
+    return { ...merged, ...outputs }
+  }, {} as JsonObject)
 }
 
-export function formatOutput(value: any): string {
+export function formatOutput(value: JsonValue): string {
   if (typeof value === 'string') {
-    return value;
+    return value
   }
-  return JSON.stringify(value);
+  return JSON.stringify(value)
 }
 
-export function debugLog(message: string, data?: any): void {
-  core.debug(message);
+export function debugLog(message: string, data?: JsonValue): void {
+  core.debug(message)
   if (data !== undefined) {
-    core.debug(JSON.stringify(data, null, 2));
+    core.debug(JSON.stringify(data, null, 2))
   }
 }
 
-export function getContextFromEnvironment(): Record<string, any> {
-  const context: Record<string, any> = {};
-  
+export function getContextFromEnvironment(): JsonObject {
+  const context: JsonObject = {}
+
   // GitHub Actions context
   if (process.env.GITHUB_ACTIONS) {
     context.github = {
@@ -88,22 +96,29 @@ export function getContextFromEnvironment(): Record<string, any> {
       run_id: process.env.GITHUB_RUN_ID || '',
       workflow: process.env.GITHUB_WORKFLOW || '',
       job: process.env.GITHUB_JOB || ''
-    };
-    
+    }
+
     // Parse event data if available
     if (process.env.GITHUB_EVENT_PATH) {
       try {
-        const fs = require('fs');
-        const eventData = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
-        context.event = eventData;
+        const eventData = JSON.parse(
+          fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')
+        ) as JsonValue
+        context.event = eventData
       } catch (error) {
-        core.debug(`Failed to parse GitHub event data: ${error}`);
+        core.debug(`Failed to parse GitHub event data: ${error}`)
       }
     }
   }
-  
+
   // Add all environment variables
-  context.env = { ...process.env };
-  
-  return context;
+  const envVars: JsonObject = {}
+  for (const [key, value] of Object.entries(process.env)) {
+    if (value !== undefined) {
+      envVars[key] = value
+    }
+  }
+  context.env = envVars
+
+  return context
 }

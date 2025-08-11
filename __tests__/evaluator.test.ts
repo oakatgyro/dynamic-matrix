@@ -1,48 +1,44 @@
-import { ConditionEvaluator } from '../src/evaluator';
-import { ConditionConfig } from '../src/types';
+import { ConditionEvaluator } from '../src/evaluator'
+import { ConditionConfig } from '../src/types'
 
 describe('ConditionEvaluator', () => {
   describe('Basic comparisons', () => {
     test('should evaluate equality', () => {
-      const context = { x: 'y', z: 'value' };
-      const evaluator = new ConditionEvaluator(context);
-      
+      const context = { x: 'y', z: 'value' }
+      const evaluator = new ConditionEvaluator(context)
+
       const config: ConditionConfig = {
         'test-condition': {
           operator: 'and',
-          conditions: [
-            { field: 'x', op: '=', value: 'y' }
-          ],
+          conditions: [{ field: 'x', op: '=', value: 'y' }],
           outputs: { result: 'matched' }
         }
-      };
-      
-      const result = evaluator.evaluate(config);
-      expect(result.matched).toBe(true);
-      expect(result.outputs).toEqual({ result: 'matched' });
-    });
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+      expect(result.outputs).toEqual({ result: 'matched' })
+    })
 
     test('should evaluate inequality', () => {
-      const context = { x: 'y' };
-      const evaluator = new ConditionEvaluator(context);
-      
+      const context = { x: 'y' }
+      const evaluator = new ConditionEvaluator(context)
+
       const config: ConditionConfig = {
         'test-condition': {
           operator: 'and',
-          conditions: [
-            { field: 'x', op: '!=', value: 'z' }
-          ]
+          conditions: [{ field: 'x', op: '!=', value: 'z' }]
         }
-      };
-      
-      const result = evaluator.evaluate(config);
-      expect(result.matched).toBe(true);
-    });
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+    })
 
     test('should evaluate numeric comparisons', () => {
-      const context = { count: 10 };
-      const evaluator = new ConditionEvaluator(context);
-      
+      const context = { count: 10 }
+      const evaluator = new ConditionEvaluator(context)
+
       const config: ConditionConfig = {
         'test-condition': {
           operator: 'and',
@@ -51,35 +47,33 @@ describe('ConditionEvaluator', () => {
             { field: 'count', op: '<', value: 20 }
           ]
         }
-      };
-      
-      const result = evaluator.evaluate(config);
-      expect(result.matched).toBe(true);
-    });
-  });
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+    })
+  })
 
   describe('String operations', () => {
     test('should evaluate contains', () => {
-      const context = { branch: 'feature/new-feature' };
-      const evaluator = new ConditionEvaluator(context);
-      
+      const context = { branch: 'feature/new-feature' }
+      const evaluator = new ConditionEvaluator(context)
+
       const config: ConditionConfig = {
         'test-condition': {
           operator: 'and',
-          conditions: [
-            { field: 'branch', op: 'contains', value: 'feature' }
-          ]
+          conditions: [{ field: 'branch', op: 'contains', value: 'feature' }]
         }
-      };
-      
-      const result = evaluator.evaluate(config);
-      expect(result.matched).toBe(true);
-    });
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+    })
 
     test('should evaluate not_contains', () => {
-      const context = { branch: 'main' };
-      const evaluator = new ConditionEvaluator(context);
-      
+      const context = { branch: 'main' }
+      const evaluator = new ConditionEvaluator(context)
+
       const config: ConditionConfig = {
         'test-condition': {
           operator: 'and',
@@ -87,35 +81,33 @@ describe('ConditionEvaluator', () => {
             { field: 'branch', op: 'not_contains', value: 'feature' }
           ]
         }
-      };
-      
-      const result = evaluator.evaluate(config);
-      expect(result.matched).toBe(true);
-    });
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+    })
 
     test('should evaluate starts_with', () => {
-      const context = { branch: 'release/v1.0' };
-      const evaluator = new ConditionEvaluator(context);
-      
+      const context = { branch: 'release/v1.0' }
+      const evaluator = new ConditionEvaluator(context)
+
       const config: ConditionConfig = {
         'test-condition': {
           operator: 'and',
-          conditions: [
-            { field: 'branch', op: 'starts_with', value: 'release' }
-          ]
+          conditions: [{ field: 'branch', op: 'starts_with', value: 'release' }]
         }
-      };
-      
-      const result = evaluator.evaluate(config);
-      expect(result.matched).toBe(true);
-    });
-  });
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+    })
+  })
 
   describe('Logical operators', () => {
     test('should evaluate AND operator', () => {
-      const context = { x: 'y', z: 'value' };
-      const evaluator = new ConditionEvaluator(context);
-      
+      const context = { x: 'y', z: 'value' }
+      const evaluator = new ConditionEvaluator(context)
+
       const config: ConditionConfig = {
         'test-condition': {
           operator: 'and',
@@ -125,17 +117,17 @@ describe('ConditionEvaluator', () => {
           ],
           outputs: { env: 'test' }
         }
-      };
-      
-      const result = evaluator.evaluate(config);
-      expect(result.matched).toBe(true);
-      expect(result.outputs).toEqual({ env: 'test' });
-    });
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+      expect(result.outputs).toEqual({ env: 'test' })
+    })
 
     test('should evaluate OR operator', () => {
-      const context = { x: 'y' };
-      const evaluator = new ConditionEvaluator(context);
-      
+      const context = { x: 'y' }
+      const evaluator = new ConditionEvaluator(context)
+
       const config: ConditionConfig = {
         'test-condition': {
           operator: 'or',
@@ -145,16 +137,16 @@ describe('ConditionEvaluator', () => {
           ],
           outputs: { env: 'test' }
         }
-      };
-      
-      const result = evaluator.evaluate(config);
-      expect(result.matched).toBe(true);
-    });
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+    })
 
     test('should handle nested conditions', () => {
-      const context = { branch: 'main', event: 'push' };
-      const evaluator = new ConditionEvaluator(context);
-      
+      const context = { branch: 'main', event: 'push' }
+      const evaluator = new ConditionEvaluator(context)
+
       const config: ConditionConfig = {
         'test-condition': {
           operator: 'or',
@@ -176,61 +168,55 @@ describe('ConditionEvaluator', () => {
           ],
           outputs: { deploy: true }
         }
-      };
-      
-      const result = evaluator.evaluate(config);
-      expect(result.matched).toBe(true);
-      expect(result.outputs).toEqual({ deploy: true });
-    });
-  });
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+      expect(result.outputs).toEqual({ deploy: true })
+    })
+  })
 
   describe('Array handling', () => {
     test('should handle array contains', () => {
-      const context = { labels: ['bug', 'urgent', 'p1'] };
-      const evaluator = new ConditionEvaluator(context);
-      
+      const context = { labels: ['bug', 'urgent', 'p1'] }
+      const evaluator = new ConditionEvaluator(context)
+
       const config: ConditionConfig = {
         'test-condition': {
           operator: 'and',
-          conditions: [
-            { field: 'labels', op: 'contains', value: 'bug' }
-          ]
+          conditions: [{ field: 'labels', op: 'contains', value: 'bug' }]
         }
-      };
-      
-      const result = evaluator.evaluate(config);
-      expect(result.matched).toBe(true);
-    });
-  });
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+    })
+  })
 
   describe('Multiple configurations', () => {
     test('should evaluate multiple configurations', () => {
-      const context = { env: 'dev' };
-      const evaluator = new ConditionEvaluator(context);
-      
+      const context = { env: 'dev' }
+      const evaluator = new ConditionEvaluator(context)
+
       const config: ConditionConfig = {
         'dev-config': {
           operator: 'and',
-          conditions: [
-            { field: 'env', op: '=', value: 'dev' }
-          ],
+          conditions: [{ field: 'env', op: '=', value: 'dev' }],
           outputs: { account: '123456' }
         },
         'prod-config': {
           operator: 'and',
-          conditions: [
-            { field: 'env', op: '=', value: 'prod' }
-          ],
+          conditions: [{ field: 'env', op: '=', value: 'prod' }],
           outputs: { account: '789012' }
         }
-      };
-      
-      const result = evaluator.evaluate(config);
-      expect(result.matched).toBe(true);
-      expect(result.matchedConditions).toContain('dev-config');
-      expect(result.outputs).toEqual({ account: '123456' });
-    });
-  });
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+      expect(result.matchedConditions).toContain('dev-config')
+      expect(result.outputs).toEqual({ account: '123456' })
+    })
+  })
 
   describe('Nested field access', () => {
     test('should access nested fields', () => {
@@ -244,20 +230,24 @@ describe('ConditionEvaluator', () => {
             }
           }
         }
-      };
-      const evaluator = new ConditionEvaluator(context);
-      
+      }
+      const evaluator = new ConditionEvaluator(context)
+
       const config: ConditionConfig = {
         'test-condition': {
           operator: 'and',
           conditions: [
-            { field: 'github.event.pull_request.base.ref', op: '=', value: 'main' }
+            {
+              field: 'github.event.pull_request.base.ref',
+              op: '=',
+              value: 'main'
+            }
           ]
         }
-      };
-      
-      const result = evaluator.evaluate(config);
-      expect(result.matched).toBe(true);
-    });
-  });
-});
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+    })
+  })
+})
