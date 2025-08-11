@@ -206,8 +206,16 @@ jobs:
         "frontend-changes": {
           "operator": "or",
           "conditions": [
-            { "field": "changed_files", "op": "contains", "value": "src/frontend" },
-            { "field": "changed_files", "op": "contains", "value": "package.json" }
+            {
+              "field": "changed_files",
+              "op": "contains",
+              "value": "src/frontend"
+            },
+            {
+              "field": "changed_files",
+              "op": "contains",
+              "value": "package.json"
+            }
           ],
           "outputs": {
             "test_suite": "frontend",
@@ -217,7 +225,11 @@ jobs:
         "backend-changes": {
           "operator": "and",
           "conditions": [
-            { "field": "changed_files", "op": "contains", "value": "src/backend" }
+            {
+              "field": "changed_files",
+              "op": "contains",
+              "value": "src/backend"
+            }
           ],
           "outputs": {
             "test_suite": "backend",
