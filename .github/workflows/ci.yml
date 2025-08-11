@@ -61,7 +61,11 @@ jobs:
             {
               "sample": {
                 "conditions": [
-                  { "field": "x", "op": "=", "value": "x" },
+                  {
+                    "field": "x",
+                    "op": "=",
+                    "value": "x"
+                  }
                 ],
                 "outputs": {
                   "action": "hello world"
