@@ -1,12 +1,15 @@
 # Dynamic Matrix Generator Action
 
-A powerful GitHub Action that generates dynamic matrices based on conditional logic. This action evaluates complex conditions against context data and produces GitHub Actions-compatible matrix outputs.
+A powerful GitHub Action that generates dynamic matrices based on conditional
+logic. This action evaluates complex conditions against context data and
+produces GitHub Actions-compatible matrix outputs.
 
 ## Features
 
 - 🔀 **Conditional Logic**: Support for AND/OR operators with nested conditions
 - 📊 **Dynamic Matrix Generation**: Create matrices based on runtime conditions
-- 🎯 **Flexible Operators**: Equality, comparison, contains, starts_with, ends_with
+- 🎯 **Flexible Operators**: Equality, comparison, contains, starts_with,
+  ends_with
 - 🔄 **Environment Variable Expansion**: Automatic expansion of `${VAR}` syntax
 - 📦 **Multiple Output Formats**: Generate matrices or merged outputs
 - 🏷️ **Named Conditions**: Track which conditions matched
@@ -16,24 +19,24 @@ A powerful GitHub Action that generates dynamic matrices based on conditional lo
 Use this action in your workflow:
 
 ```yaml
-- uses: ./dynamic-matrix-action  # or your-org/dynamic-matrix-action@v1
+- uses: ./dynamic-matrix-action # or your-org/dynamic-matrix-action@v1
   with:
     conditions-file: conditions.json
 ```
 
 ## Inputs
 
-| Input | Description | Required |
-|-------|-------------|----------|
-| `conditions-file` | Path to conditions JSON file | No* |
-| `conditions-json` | Inline conditions JSON string | No* |
+| Input             | Description                   | Required |
+| ----------------- | ----------------------------- | -------- |
+| `conditions-file` | Path to conditions JSON file  | No\*     |
+| `conditions-json` | Inline conditions JSON string | No\*     |
 
-*Either `conditions-file` or `conditions-json` must be provided
+\*Either `conditions-file` or `conditions-json` must be provided
 
 ## Outputs
 
-| Output | Description |
-|--------|-------------|
+| Output   | Description                               |
+| -------- | ----------------------------------------- |
 | `matrix` | Generated matrix in GitHub Actions format |
 
 ## Condition Configuration
@@ -62,20 +65,23 @@ Use this action in your workflow:
 ### Supported Operators
 
 #### Comparison Operators
+
 - `=` - Equality
-- `!=` - Inequality  
+- `!=` - Inequality
 - `>` - Greater than
 - `>=` - Greater than or equal
 - `<` - Less than
 - `<=` - Less than or equal
 
 #### String Operators
+
 - `contains` - Check if string/array contains value
 - `not_contains` - Check if string/array doesn't contain value
 - `starts_with` - Check if string starts with value
 - `ends_with` - Check if string ends with value
 
 #### Logical Operators
+
 - `and` - All conditions must match
 - `or` - At least one condition must match
 
@@ -94,7 +100,7 @@ Use this action in your workflow:
         ]
       },
       {
-        "operator": "and", 
+        "operator": "and",
         "conditions": [
           { "field": "branch", "op": "=", "value": "develop" },
           { "field": "event", "op": "=", "value": "pull_request" }
@@ -113,13 +119,12 @@ Use this action in your workflow:
 ### Example 1: Environment-based Matrix
 
 **conditions.json:**
+
 ```json
 {
   "dev-environment": {
     "operator": "and",
-    "conditions": [
-      { "field": "branch", "op": "=", "value": "develop" }
-    ],
+    "conditions": [{ "field": "branch", "op": "=", "value": "develop" }],
     "outputs": {
       "env": "dev",
       "account": "123456",
@@ -142,6 +147,7 @@ Use this action in your workflow:
 ```
 
 **Workflow:**
+
 ```yaml
 jobs:
   generate-matrix:
@@ -150,7 +156,7 @@ jobs:
       matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
-      
+
       - id: matrix
         uses: ./dynamic-matrix-action
         with:
@@ -275,7 +281,7 @@ npm run build
 ### Format & Lint
 
 ```bash
-npm run format
+npm run format:write
 npm run lint
 ```
 
