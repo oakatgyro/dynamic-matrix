@@ -202,5 +202,4 @@ describe('Utils', () => {
       expect(formatOutput(undefined)).toBe(undefined)
     })
   })
-
 })

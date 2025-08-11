@@ -264,7 +264,7 @@ describe('ConditionEvaluator', () => {
       }
 
       expect(() => evaluator.evaluate(config)).toThrow(
-        'Condition "test-condition" must have either \'conditions\' or \'conditions-file\''
+        "Condition \"test-condition\" must have either 'conditions' or 'conditions-file'"
       )
     })
 
@@ -279,7 +279,9 @@ describe('ConditionEvaluator', () => {
         }
       }
 
-      expect(() => evaluator.evaluate(config)).toThrow('Unknown operator: invalid')
+      expect(() => evaluator.evaluate(config)).toThrow(
+        'Unknown operator: invalid'
+      )
     })
 
     test('should handle empty conditions array', () => {
