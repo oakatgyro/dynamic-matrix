@@ -275,14 +275,24 @@ npm test
 ### Build
 
 ```bash
-npm run build
+npm run package       # Build the action
+npm run bundle        # Format and package
 ```
 
 ### Format & Lint
 
 ```bash
-npm run format:write
-npm run lint
+npm run format:write  # Format all files
+npm run format:check  # Check formatting
+npm run lint          # Lint TypeScript files
+```
+
+### Other Commands
+
+```bash
+npm run coverage      # Generate coverage badge
+npm run package:watch # Watch mode for development
+npm run all          # Run format, lint, test, coverage, and package
 ```
 
 ## License
