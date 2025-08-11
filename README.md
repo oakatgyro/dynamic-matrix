@@ -1,5 +1,9 @@
 # Dynamic Matrix Generator Action
 
+[![GitHub Super-Linter](https://github.com/oakatgyro/dynamic-matrix/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
+![CI](https://github.com/oakatgyro/dynamic-matrix/actions/workflows/ci.yml/badge.svg)
+[![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
+
 A powerful GitHub Action that generates dynamic matrices based on conditional
 logic. This action evaluates complex conditions against context data and
 produces GitHub Actions-compatible matrix outputs.

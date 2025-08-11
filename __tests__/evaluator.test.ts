@@ -250,4 +250,217 @@ describe('ConditionEvaluator', () => {
       expect(result.matched).toBe(true)
     })
   })
+
+  describe('Error cases', () => {
+    test('should throw error for missing conditions and conditions-file', () => {
+      const context = { x: 'y' }
+      const evaluator = new ConditionEvaluator(context)
+
+      const config: ConditionConfig = {
+        'test-condition': {
+          operator: 'and',
+          outputs: { result: 'test' }
+        } as any
+      }
+
+      expect(() => evaluator.evaluate(config)).toThrow(
+        "Condition \"test-condition\" must have either 'conditions' or 'conditions-file'"
+      )
+    })
+
+    test('should throw error for unknown operator', () => {
+      const context = { x: 'y' }
+      const evaluator = new ConditionEvaluator(context)
+
+      const config: ConditionConfig = {
+        'test-condition': {
+          operator: 'and',
+          conditions: [{ field: 'x', op: 'invalid' as any, value: 'y' }]
+        }
+      }
+
+      expect(() => evaluator.evaluate(config)).toThrow(
+        'Unknown operator: invalid'
+      )
+    })
+
+    test('should handle empty conditions array', () => {
+      const context = { x: 'y' }
+      const evaluator = new ConditionEvaluator(context)
+
+      const config: ConditionConfig = {
+        'test-condition': {
+          operator: 'and',
+          conditions: [],
+          outputs: { result: 'default' }
+        }
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+      expect(result.outputs).toEqual({ result: 'default' })
+    })
+
+    test('should handle ends_with operator', () => {
+      const context = { filename: 'test.js' }
+      const evaluator = new ConditionEvaluator(context)
+
+      const config: ConditionConfig = {
+        'test-condition': {
+          operator: 'and',
+          conditions: [{ field: 'filename', op: 'ends_with', value: '.js' }]
+        }
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+    })
+
+    test('should handle ends_with with non-string values', () => {
+      const context = { value: 123 }
+      const evaluator = new ConditionEvaluator(context)
+
+      const config: ConditionConfig = {
+        'test-condition': {
+          operator: 'and',
+          conditions: [{ field: 'value', op: 'ends_with', value: '23' }]
+        }
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(false)
+    })
+
+    test('should handle > operator', () => {
+      const context = { count: 10 }
+      const evaluator = new ConditionEvaluator(context)
+
+      const config: ConditionConfig = {
+        'test-condition': {
+          operator: 'and',
+          conditions: [{ field: 'count', op: '>', value: 5 }]
+        }
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+    })
+
+    test('should handle <= operator', () => {
+      const context = { count: 10 }
+      const evaluator = new ConditionEvaluator(context)
+
+      const config: ConditionConfig = {
+        'test-condition': {
+          operator: 'and',
+          conditions: [{ field: 'count', op: '<=', value: 10 }]
+        }
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+    })
+
+    test('should handle array not_contains', () => {
+      const context = { tags: ['release', 'stable'] }
+      const evaluator = new ConditionEvaluator(context)
+
+      const config: ConditionConfig = {
+        'test-condition': {
+          operator: 'and',
+          conditions: [{ field: 'tags', op: 'not_contains', value: 'beta' }]
+        }
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+    })
+
+    test('should handle contains with non-string and non-array values', () => {
+      const context = { value: 123 }
+      const evaluator = new ConditionEvaluator(context)
+
+      const config: ConditionConfig = {
+        'test-condition': {
+          operator: 'and',
+          conditions: [{ field: 'value', op: 'contains', value: '2' }]
+        }
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(false)
+    })
+
+    test('should handle not_contains with non-string and non-array values', () => {
+      const context = { value: 123 }
+      const evaluator = new ConditionEvaluator(context)
+
+      const config: ConditionConfig = {
+        'test-condition': {
+          operator: 'and',
+          conditions: [{ field: 'value', op: 'not_contains', value: '2' }]
+        }
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(true)
+    })
+
+    test('should handle undefined field access in nested path', () => {
+      const context = { github: null }
+      const evaluator = new ConditionEvaluator(context)
+
+      const config: ConditionConfig = {
+        'test-condition': {
+          operator: 'and',
+          conditions: [
+            {
+              field: 'github.event.pull_request',
+              op: '=',
+              value: 'test'
+            }
+          ]
+        }
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(false)
+    })
+
+    test('should handle array in nested field path', () => {
+      const context = { data: ['item1', 'item2'] }
+      const evaluator = new ConditionEvaluator(context)
+
+      const config: ConditionConfig = {
+        'test-condition': {
+          operator: 'and',
+          conditions: [
+            {
+              field: 'data.subfield',
+              op: '=',
+              value: 'test'
+            }
+          ]
+        }
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(false)
+    })
+
+    test('should handle starts_with with non-string values', () => {
+      const context = { value: 123 }
+      const evaluator = new ConditionEvaluator(context)
+
+      const config: ConditionConfig = {
+        'test-condition': {
+          operator: 'and',
+          conditions: [{ field: 'value', op: 'starts_with', value: '1' }]
+        }
+      }
+
+      const result = evaluator.evaluate(config)
+      expect(result.matched).toBe(false)
+    })
+  })
 })
