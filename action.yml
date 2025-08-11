@@ -20,5 +20,5 @@ outputs:
     description: 'Generated matrix in GitHub Actions format'
 
 runs:
-  using: 'node24'
+  using: 'node20'
   main: 'dist/index.js'
